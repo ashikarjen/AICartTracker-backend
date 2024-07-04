@@ -1,0 +1,8 @@
+django
+djangorestframework
+psycopg2-binary
+beautifulsoup4
+requests
+selenium
+webdriver_manager
+gunicorn
