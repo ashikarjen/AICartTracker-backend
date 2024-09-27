@@ -5,6 +5,31 @@ from .models import Product
 from .serializers import ProductSerializer
 from .tasks import scrape_product_data, analyze_product_reviews, update_product_info
 
+from rest_framework.views import APIView
+
+class NLPCommandView(APIView):
+    def post(self, request):
+        command_text = request.data.get('command')
+        if not command_text:
+            return Response({'error': 'Command text is required.'}, status=status.HTTP_400_BAD_REQUEST)
+        # Simple NLP parsing (for demonstration)
+        if 'scrape' in command_text.lower():
+            url = extract_url_from_command(command_text)
+            if url:
+                scrape_product_data.delay(url)
+                return Response({'status': 'Scraping started.'})
+            else:
+                return Response({'error': 'No URL found in command.'}, status=status.HTTP_400_BAD_REQUEST)
+        elif 'bookmark' in command_text.lower():
+            # Implement bookmarking logic
+            pass
+        elif 'more info' in command_text.lower():
+            # Implement fetching more info
+            pass
+        else:
+            return Response({'error': 'Command not recognized.'}, status=status.HTTP_400_BAD_REQUEST)
+
+
 class ProductViewSet(viewsets.ViewSet):
     """
     A simple ViewSet for listing or retrieving products.

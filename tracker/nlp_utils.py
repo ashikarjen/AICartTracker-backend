@@ -1,4 +1,10 @@
 from textblob import TextBlob
+import re
+
+def extract_url_from_command(command_text):
+    url_regex = r'(https?://[^\s]+)'
+    urls = re.findall(url_regex, command_text)
+    return urls[0] if urls else None
 
 def analyze_sentiment(text):
     analysis = TextBlob(text)
