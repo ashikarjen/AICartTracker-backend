@@ -2,6 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from .models import Product
+from .nlp_utils import extract_url_from_command
 from .serializers import ProductSerializer
 from .tasks import scrape_product_data, analyze_product_reviews, update_product_info
 
@@ -70,3 +71,4 @@ class ProductViewSet(viewsets.ViewSet):
         # Start task to fetch more info
         update_product_info.delay(product.id)
         return Response({'status': 'Fetching additional information.'})
+
