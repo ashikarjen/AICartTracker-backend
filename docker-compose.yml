@@ -37,5 +37,18 @@ services:
       - CELERY_BROKER_URL=redis://redis:6380/0
     shm_size: '4gb'  # Increased shared memory size to handle heavy operations (important for Selenium)
 
+  test:
+    build: .
+    command: python manage.py test  # Runs the tests
+    depends_on:
+      - db
+      - redis
+    environment:
+      - DATABASE_NAME=carttracker
+      - DATABASE_USER=${DATABASE_USER}
+      - DATABASE_PASSWORD=${DATABASE_PASSWORD}
+      - DATABASE_HOST=db
+      - DATABASE_PORT=5432
+
 volumes:
   postgres_data:

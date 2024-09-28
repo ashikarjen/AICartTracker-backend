@@ -66,12 +66,12 @@ RUN apt-get update && apt-get install -y unzip curl \
     && wget -O /tmp/chromedriver.zip https://chromedriver.storage.googleapis.com/$(curl -sS chromedriver.storage.googleapis.com/LATEST_RELEASE)/chromedriver_linux64.zip \
     && unzip /tmp/chromedriver.zip chromedriver -d /usr/local/bin/
 
-
-
 # Install Python dependencies
 COPY requirements.txt .
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
+# Download spaCy English model
+RUN python -m spacy download en_core_web_sm
 
 # Copy project
 COPY . .
@@ -81,3 +81,5 @@ EXPOSE 8000
 
 # Start the server
 CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+
+#CMD ["gunicorn", "--workers", "3", "--timeout", "300", "--bind", "0.0.0.0:8000", "aicarttracker.wsgi:application"]

@@ -1,25 +1,18 @@
-from textblob import TextBlob
+import spacy
 import re
 
-def extract_url_from_command(command_text):
-    url_regex = r'(https?://[^\s]+)'
-    urls = re.findall(url_regex, command_text)
-    return urls[0] if urls else None
+# Load the spaCy English model
+nlp = spacy.load("en_core_web_sm")
 
-def analyze_sentiment(text):
-    analysis = TextBlob(text)
-    polarity = analysis.sentiment.polarity
-    if polarity > 0.1:
-        return 'Positive'
-    elif polarity < -0.1:
-        return 'Negative'
+def extract_url(text):
+    # Used regular expressions to find URLs
+    url_pattern = re.compile(r'https?://\S+|www\.\S+')
+    urls = url_pattern.findall(text)
+    return urls
+
+def get_intent(text):
+    # Simple keyword-based intent recognition
+    if "track" in text.lower():
+        return "track_product"
     else:
-        return 'Neutral'
-
-def generate_product_summary(sentiments):
-    total = len(sentiments)
-    positive = sentiments.count('Positive')
-    negative = sentiments.count('Negative')
-    neutral = sentiments.count('Neutral')
-    summary = f'Total Reviews: {total}\nPositive: {positive}\nNegative: {negative}\nNeutral: {neutral}'
-    return summary
+        return "unknown_intent"

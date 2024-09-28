@@ -3,7 +3,6 @@ from .models import Product, Review
 import requests
 from bs4 import BeautifulSoup
 from django.utils import timezone
-from .nlp_utils import analyze_sentiment
 from .scraper import scrape_daraz_product
 
 @shared_task
@@ -22,20 +21,6 @@ def scrape_product_data(url):
     # Analyze reviews
     analyze_product_reviews.delay(product.id)
 
-
-@shared_task
-def analyze_product_reviews(product_id):
-    product = Product.objects.get(id=product_id)
-    reviews = product.reviews.all()
-    sentiments = []
-    for review in reviews:
-        sentiment = analyze_sentiment(review.content)
-        review.sentiment = sentiment
-        review.save()
-        sentiments.append(sentiment)
-    # Update product summary based on sentiments
-    product.summary = generate_product_summary(sentiments)
-    product.save()
 
 @shared_task
 def update_product_info(product_id):

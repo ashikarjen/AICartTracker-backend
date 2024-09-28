@@ -2,9 +2,9 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from .models import Product
-from .nlp_utils import extract_url_from_command
+from .nlp_utils import extract_url, get_intent
 from .serializers import ProductSerializer
-from .tasks import scrape_product_data, analyze_product_reviews, update_product_info
+from .tasks import update_product_info
 from rest_framework.views import APIView
 from .scraper import scrape_daraz_product
 
@@ -14,27 +14,32 @@ def extract_daraz_id(url):
     match = re.search(r'-i(\d+)-s', url)
     return match.group(1) if match else None
 
-class NLPCommandView(APIView):
+class NaturalLanguageInputView(APIView):
     def post(self, request):
-        command_text = request.data.get('command')
-        if not command_text:
-            return Response({'error': 'Command text is required.'}, status=status.HTTP_400_BAD_REQUEST)
-        # Simple NLP parsing (for demonstration)
-        if 'scrape' in command_text.lower():
-            url = extract_url_from_command(command_text)
-            if url:
-                scrape_product_data.delay(url)
-                return Response({'status': 'Scraping started.'})
-            else:
-                return Response({'error': 'No URL found in command.'}, status=status.HTTP_400_BAD_REQUEST)
-        elif 'bookmark' in command_text.lower():
-            # Implement bookmarking logic
-            pass
-        elif 'more info' in command_text.lower():
-            # Implement fetching more info
-            pass
+        user_input = request.data.get('text')
+        if not user_input:
+            return Response({'error': 'No text provided.'}, status=400)
+
+        # Extract URL(s) from the input text
+        urls = extract_url(user_input)
+        if not urls:
+            return Response({'error': 'No URL found in the input.'}, status=400)
+
+        # Recognize user intent
+        intent = get_intent(user_input)
+
+        if intent == "track_product":
+            # Proceed with tracking logic
+            product_url = urls[0]  # Assuming the first URL is the product URL
+            
+            # Call the scrape function directly
+            scrape_view = ProductViewSet()
+            scrape_request_data = {'url': product_url}
+            scrape_response = scrape_view.scrape(scrape_request_data)
+
+            return scrape_response
         else:
-            return Response({'error': 'Command not recognized.'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Unknown intent.'}, status=400)
 
 
 class ProductViewSet(viewsets.ViewSet):
@@ -57,7 +62,7 @@ class ProductViewSet(viewsets.ViewSet):
     
     @action(detail=False, methods=['post'])
     def scrape(self, request):
-        url = request.data.get('url')
+        url = request.get('url')
         if not url:
             return Response({'error': 'URL is required.'}, status=status.HTTP_400_BAD_REQUEST)
 

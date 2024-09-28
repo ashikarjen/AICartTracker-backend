@@ -6,7 +6,7 @@ on:
       - main  # Triggers the workflow on pushes to the main branch
 
 jobs:
-  build-and-push:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -26,13 +26,27 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
       # Step 4: Build and Push Docker Image
-      - name: Build and Push Docker Image
+      - name: Build Docker Image
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          push: false  # Build but don't push yet, we'll test first
+          tags: ashikarjen/aicarttracker:test  # Temporary tag for testing
+
+      # Step 5: Run Tests Inside Docker
+      - name: Run Tests
+        run: docker-compose -f docker-compose.yml up --abort-on-container-exit --exit-code-from test test
+        # This command will run the 'test' service and exit if tests fail.
+
+      # Step 6: Push Docker Image if Tests Pass
+      - name: Push Docker Image
+        if: success()  # Only push if the previous step was successful
         uses: docker/build-push-action@v4
         with:
           context: .
           push: true
-          tags: ashikarjen/aicarttracker:latest  # Replace with your Docker Hub username and repository
+          tags: ashikarjen/aicarttracker:v1  # Replace with your Docker Hub username and repository
 
-      # Optional Step 5: Cleanup dangling images (Optional but recommended)
+      # Optional Step 7: Cleanup dangling images
       - name: Remove Dangling Images
         run: docker image prune -f
