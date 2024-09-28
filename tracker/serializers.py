@@ -7,8 +7,8 @@ class ReviewSerializer(serializers.ModelSerializer):
         fields = ['reviewer_name', 'rating', 'content', 'sentiment', 'date_posted']
 
 class ProductSerializer(serializers.ModelSerializer):
-    reviews = ReviewSerializer(many=True, read_only=True)
-    
+    image_urls = serializers.ListField(child=serializers.URLField(), allow_empty=True)
+
     class Meta:
         model = Product
-        fields = ['id', 'name', 'daraz_id', 'url', 'price', 'last_checked', 'summary', 'image_urls', 'reviews']
+        fields = ['id', 'name', 'daraz_id', 'price', 'url', 'details', 'rating', 'image_urls']

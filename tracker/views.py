@@ -5,8 +5,14 @@ from .models import Product
 from .nlp_utils import extract_url_from_command
 from .serializers import ProductSerializer
 from .tasks import scrape_product_data, analyze_product_reviews, update_product_info
-
 from rest_framework.views import APIView
+from .scraper import scrape_daraz_product
+
+import re
+
+def extract_daraz_id(url):
+    match = re.search(r'-i(\d+)-s', url)
+    return match.group(1) if match else None
 
 class NLPCommandView(APIView):
     def post(self, request):
@@ -54,9 +60,29 @@ class ProductViewSet(viewsets.ViewSet):
         url = request.data.get('url')
         if not url:
             return Response({'error': 'URL is required.'}, status=status.HTTP_400_BAD_REQUEST)
-        # Start scraping task
-        scrape_product_data.delay(url)
-        return Response({'status': 'Scraping started.'})
+
+        daraz_id = extract_daraz_id(url)
+        if not daraz_id:
+            return Response({'error': 'Invalid Daraz product URL.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Check if the product already exists
+        try:
+            product = Product.objects.get(daraz_id=daraz_id)
+            serializer = ProductSerializer(product)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Product.DoesNotExist:
+            # Scrape the product data
+            product_data = scrape_daraz_product(url)
+            if not product_data:
+                return Response({'error': 'Failed to scrape product data.'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+            # Save the product data
+            serializer = ProductSerializer(data=product_data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     @action(detail=True, methods=['post'])
     def bookmark(self, request, pk=None):

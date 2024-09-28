@@ -4,7 +4,7 @@ import requests
 from bs4 import BeautifulSoup
 from django.utils import timezone
 from .nlp_utils import analyze_sentiment
-from .scraper import scrape_daraz_product, scrape_daraz_reviews
+from .scraper import scrape_daraz_product
 
 @shared_task
 def scrape_product_data(url):

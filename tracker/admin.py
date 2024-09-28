@@ -3,7 +3,7 @@ from .models import Product, Review
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'price', 'last_checked')
+    list_display = ('name', 'price')
     search_fields = ('name', 'daraz_id')
 
 @admin.register(Review)
