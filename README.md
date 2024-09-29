@@ -9,7 +9,8 @@ The AI Cart Tracker Backend is a learning-based demo project developed to explor
 3. **Product Tracking:** Automatically scrapes and tracks product details, such as price, title, and ratings, over time.
 4. **Asynchronous Processing:** Handles scraping tasks asynchronously to improve performance and user experience.
 5. **Dockerized Deployment:** Fully containerized using Docker, making it easy to deploy and run on various environments.
-6. **CI/CD Pipeline:** Uses GitHub Actions for continuous integration and deployment to ensure smooth and automated updates.
+6. **Kubernetes Minikube:** Deployed in a Kubernetes environment using Minikube for orchestration and scalability.
+7. **CI/CD Pipeline:** Uses GitHub Actions for continuous integration and deployment to ensure smooth and automated updates.
 
 ## Technology Stack
 1. **Backend:** Django
@@ -18,8 +19,9 @@ The AI Cart Tracker Backend is a learning-based demo project developed to explor
 4. **Message Broker:** Redis to manage task queues.
 5. **Database:** PostgreSQL for storing product and user data.
 6. **Containerization:** Docker and Docker Compose for packaging and deployment.
-7. **Web Server:** Gunicorn to serve the Django application.
-8. **CI/CD:** GitHub Actions to automate the build, test, and deployment processes.
+7. **Container Orchestration:** Kubernetes (Minikube) for managing the deployment and scaling of containers.
+8. **Web Server:** Gunicorn to serve the Django application.
+9. **CI/CD:** GitHub Actions to automate the build, test, and deployment processes.
 
 ## How It Works
 1. **User Input:** Users provide text input that includes product URLs and commands (e.g., "Please track this product: [URL]").
@@ -30,7 +32,7 @@ The AI Cart Tracker Backend is a learning-based demo project developed to explor
 6. **API Responses:** The application provides API endpoints that return the status and results of the scraping tasks.
 
 ## Deployment
-The project is fully containerized using Docker, allowing for easy setup and deployment. The application, database, and other services are defined in a docker-compose.yml file, enabling all components to run seamlessly in isolated containers.
+The project is fully containerized using Docker, allowing for easy setup and deployment. The application, database, and other services are defined in a docker-compose.yml file, enabling all components to run seamlessly in isolated containers. For orchestration and scaling, Kubernetes (Minikube) is used, making it easier to manage and deploy the application across clusters.
 
 ## CI/CD Pipeline
 A GitHub Actions workflow automates the continuous integration and deployment process. The pipeline builds the Docker image, runs tests, and pushes the image to Docker Hub whenever changes are pushed to the main branch.
