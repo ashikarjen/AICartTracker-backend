@@ -79,7 +79,12 @@ COPY . .
 # Expose port
 EXPOSE 8000
 
-# Start the server
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Copy and grant permission to entrypoint.sh
+COPY entrypoint.sh /usr/src/app/entrypoint.sh
+RUN chmod +x /usr/src/app/entrypoint.sh
 
-#CMD ["gunicorn", "--workers", "3", "--timeout", "300", "--bind", "0.0.0.0:8000", "aicarttracker.wsgi:application"]
+# Use entrypoint.sh as the entry point for the container
+ENTRYPOINT ["/usr/src/app/entrypoint.sh"]
+
+# The CMD is optional and will be passed as arguments to entrypoint.sh
+CMD ["gunicorn", "--workers", "3", "--timeout", "300", "--bind", "0.0.0.0:8000", "aicarttracker.wsgi:application"]

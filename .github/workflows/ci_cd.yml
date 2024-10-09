@@ -39,12 +39,7 @@ jobs:
           push: false  # Build but don't push yet, we'll test first
           tags: ashikarjen/aicarttracker:test  # Temporary tag for testing
 
-      # Step 6: Run Tests Inside Docker
-      #- name: Run Tests
-       # run: docker-compose -f docker-compose.yml up --abort-on-container-exit --exit-code-from test test
-        # This command will run the 'test' service and exit if tests fail.
-
-      # Step 7: Push Docker Image if Tests Pass
+      # Step 6: Push Docker Image if Tests Pass
       - name: Push Docker Image
         if: success()  # Only push if the previous step was successful
         uses: docker/build-push-action@v4
@@ -53,6 +48,6 @@ jobs:
           push: true
           tags: ashikarjen/aicarttracker:v1  # Replace with your Docker Hub username and repository
 
-      # Optional Step 8: Cleanup dangling images
+      # Optional Step 7: Cleanup dangling images
       - name: Remove Dangling Images
         run: docker image prune -f
