@@ -20,7 +20,7 @@ echo "Applying database migrations..."
 python manage.py migrate
 
 # (Optional) Collect static files
-cho "Collecting static files..."
+echo "Collecting static files..."
 python manage.py collectstatic --noinput
 
 # Start the Gunicorn server
